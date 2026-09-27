@@ -38,27 +38,26 @@ lora_config = LoraConfig(
     task_type="CAUSAL_LM",
 )
 
-# --- THIS WAS MISSING: turns one jsonl row into Qwen3-VL's expected message format ---
+# --- Turns one jsonl row into Qwen3-VL's expected message format ---
 def format_example(example):
     conv = example["conversation"]
     user_msg = conv[0]["content"]
     assistant_msg = conv[1]["content"]
 
-    if "image" in example:
+    if example.get("image_path") is not None:
         # Single-image case (binary, mcq, captioning, bounding box)
-        image = Image.open(example["image"]).convert("RGB")
+        image = Image.open(example["image_path"]).convert("RGB")
         images = [image]
         content = [{"type": "image"}, {"type": "text", "text": user_msg}]
 
-    elif "image_optical" in example:
+    elif example.get("image_optical") is not None:
         # Optical-SAR pair
         img_opt = Image.open(example["image_optical"]).convert("RGB")
         img_sar = Image.open(example["image_sar"]).convert("RGB")
         images = [img_opt, img_sar]
         content = [{"type": "image"}, {"type": "image"}, {"type": "text", "text": user_msg}]
 
-    elif "image_t1" in example:
-        # Bi-temporal change pair
+    elif example.get("image_t1") is not None:        # Bi-temporal change pair
         img_t1 = Image.open(example["image_t1"]).convert("RGB")
         img_t2 = Image.open(example["image_t2"]).convert("RGB")
         images = [img_t1, img_t2]
@@ -81,8 +80,27 @@ def load_jsonl(path):
             examples.append(json.loads(line))
     return examples
 
-train_raw = load_jsonl("train_data.jsonl")
-val_raw = load_jsonl("val_data.jsonl")
+train_raw = load_jsonl("train_data_full.jsonl")
+val_raw = load_jsonl("val_data_full.jsonl")
+
+def normalize_example(ex):
+    return {
+        "conversation": ex["conversation"],
+        "type": ex.get("type"),
+        "image_path": ex.get("image_path"),
+        "image_optical": ex.get("image_optical"),
+        "image_sar": ex.get("image_sar"),
+        "image_t1": ex.get("image_t1"),
+        "image_t2": ex.get("image_t2"),
+    }
+
+train_raw = [normalize_example(ex) for ex in train_raw]
+val_raw = [normalize_example(ex) for ex in val_raw]
+
+# Rename "image" -> "image_path" so `datasets` doesn't auto-intercept it as a special Image column
+for ex in train_raw + val_raw:
+    if "image" in ex:
+        ex["image_path"] = ex.pop("image")
 
 train_dataset = Dataset.from_list(train_raw)
 val_dataset = Dataset.from_list(val_raw)
@@ -92,7 +110,7 @@ val_dataset = val_dataset.map(format_example, remove_columns=val_dataset.column_
 
 # --- Training settings ---
 training_args = SFTConfig(
-    output_dir="./qwen3vl4b-satquery-lora-v2",
+    output_dir="./qwen3vl4b-satquery-lora-final",
     per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
     num_train_epochs=3,
@@ -115,5 +133,5 @@ trainer = SFTTrainer(
 )
 
 trainer.train()
-trainer.save_model("./qwen3vl4b-satquery-lora-v2/final")
+trainer.save_model("./qwen3vl4b-satquery-lora-final/final")
 print("Training complete. Adapter saved.")
