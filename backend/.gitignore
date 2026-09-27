@@ -1,0 +1,15 @@
+# Virtual environment - never commit, huge and machine-specific
+satquery_env/
+
+# Model weights and cache - huge files, shouldn't go in git
+*.safetensors
+*.bin
+__pycache__/
+*.pyc
+
+# Hugging Face cache (in case it ever gets created locally in-project)
+.cache/
+
+# OS junk files
+.DS_Store
+Thumbs.db
