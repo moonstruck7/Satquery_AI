@@ -87,7 +87,7 @@ def normalize_example(ex):
     return {
         "conversation": ex["conversation"],
         "type": ex.get("type"),
-        "image_path": ex.get("image_path"),
+        "image_path": ex.get("image_path") or ex.get("image"),  # handles both key names
         "image_optical": ex.get("image_optical"),
         "image_sar": ex.get("image_sar"),
         "image_t1": ex.get("image_t1"),
@@ -96,11 +96,6 @@ def normalize_example(ex):
 
 train_raw = [normalize_example(ex) for ex in train_raw]
 val_raw = [normalize_example(ex) for ex in val_raw]
-
-# Rename "image" -> "image_path" so `datasets` doesn't auto-intercept it as a special Image column
-for ex in train_raw + val_raw:
-    if "image" in ex:
-        ex["image_path"] = ex.pop("image")
 
 train_dataset = Dataset.from_list(train_raw)
 val_dataset = Dataset.from_list(val_raw)
