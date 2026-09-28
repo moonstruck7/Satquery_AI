@@ -27,7 +27,7 @@ base_model = AutoModelForImageTextToText.from_pretrained(
 model = PeftModel.from_pretrained(base_model, ADAPTER_PATH)
 print("Model ready.\n")
 
-def ask(image_path, question, max_new_tokens=150):
+def ask(image_path, question, max_new_tokens=1000):
     image = Image.open(image_path).convert("RGB")
     messages = [
         {"role": "user", "content": [
