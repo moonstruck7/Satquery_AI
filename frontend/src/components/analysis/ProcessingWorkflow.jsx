@@ -37,7 +37,7 @@ export function ProcessingWorkflow() {
 
         <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300"
+            className="h-full bg-linear-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300"
             style={{ width: `${((processingStep + 1) / stages.length) * 100}%` }}
           />
         </div>

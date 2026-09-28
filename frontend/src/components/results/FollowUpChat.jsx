@@ -48,7 +48,7 @@ export function FollowUpChat() {
                 className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-white ${
                   isUser
                     ? 'bg-blue-600'
-                    : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+                    : 'bg-linear-to-br from-cyan-500 to-blue-600'
                 }`}
               >
                 {isUser ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
