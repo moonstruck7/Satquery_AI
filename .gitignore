@@ -4,6 +4,8 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
+.coverage
+htmlcov/
 
 # --- Virtual Environments ---
 venv/
@@ -23,13 +25,21 @@ satquery_env/
 qwen3vl4b-satquery-lora-final/
 qwen3vl4b-satquery-lora-v2/
 checkpoint-*/
+adapter_model.bin
+adapter_model.safetensors
 
 # --- Hugging Face Cache & Artifacts ---
 .cache/
 huggingface/
 
-# --- Environment Files & OS Files ---
+# --- Environment Files & Secrets ---
 .env
+.env.local
+*.secret
+
+# --- IDEs & System Files ---
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 *.log
